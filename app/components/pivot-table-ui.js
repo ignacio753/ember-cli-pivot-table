@@ -1,0 +1,1 @@
+export { default } from 'ember-cli-pivot-table/components/pivot-table-ui';
