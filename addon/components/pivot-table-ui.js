@@ -1,29 +1,66 @@
 import Ember from 'ember';
 import layout from '../templates/components/pivot-table-ui';
 
+
+
 export default Ember.Component.extend({
-  layout: layout
+  _pivot: null,
+  _data: null,
 
-  setupPivottable: function() {
+  didInsertElement() {
+    let input = JSON.parse(this.get('params').get('input'));
 
-      var pikaday = new Pikaday({
-      field: this.$()[0],
-      onSelect: function() { that.userSelectedDate(); },
-      firstDay: 1,
-      format: this.get('format') || 'DD.MM.YYYY'
-    });
+var OptionsConfig = Ember.Object.extend({
 
-    this.set('pikaday', pikaday);
-    this.get('pikaday').setDate(this.get('value'), true);
+  options: {
+      onRefresh: function(config) {
+          var config_copy = JSON.parse(JSON.stringify(config));
+          //delete some values which are functions
+          delete config_copy["aggregators"];
+          delete config_copy["renderers"];
+          delete config_copy["derivedAttributes"];
+          //delete some bulky default values
+          delete config_copy["rendererOptions"];
+          delete config_copy["localeStrings"];
+          var data = JSON.stringify(config_copy, undefined, 2);
+          //Ember.Logger.debug("config is",data);
+          //component.get('_data').set(data);
+          this.get('component').sendAction('change',data);// get('_data').set(data);
+      }
+   }
+});
+var optionsConfigInstance = OptionsConfig.create({component: this});
 
-    pivotUI()
-  }.on('didInsertElement'),
+    //this.get('params').get('options')
+    let pivot = this._editor = this.$().pivotUI(input, optionsConfigInstance.options);
+    //Ember.Logger.debug("pivot component is",pivot);
+  },
 
-  buildOptions: function() {
+  actions: {
+    change: function() {
+      this.sendAction('change', _data);
+    }
+  },
+
+
+  
+/*
+  options: function () {
     return {
-      input: {},
-      options: {},
-    };
-  }
+      hiddenAttributes : ["id"],
+      /*onRefresh: function(config) {
+          var config_copy = JSON.parse(JSON.stringify(config));
+          //delete some values which are functions
+          delete config_copy["aggregators"];
+          delete config_copy["renderers"];
+          delete config_copy["derivedAttributes"];
+          //delete some bulky default values
+          delete config_copy["rendererOptions"];
+          delete config_copy["localeStrings"];
+          var data = JSON.stringify(config_copy, undefined, 2);
+          Ember.Logger.debug("config is",data);
+      }*/
+    //}
+  //}
 
 });
