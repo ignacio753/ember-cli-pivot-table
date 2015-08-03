@@ -9,11 +9,8 @@ module.exports = {
   // }
 
   afterInstall: function(options) {
-    return this.addBowerPackageToProject('pivottable');
+    return this.addBowerPackageToProject('jqueryui').then(function() {
+      return this.addBowerPackageToProject('pivottable');
+    });
   },
-
-  included: function(app) {
-    this._super.included(app);
-    this.app.import(app.bowerDirectory + '/remarkable/dist/remarkable.js');
-  }
 };
